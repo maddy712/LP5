@@ -60,7 +60,7 @@ int main()
 
 
 
-// 1. create file vector_addition.cu
+// 1. create file vector_add.cu
 // 2. paste code, save file 
 // 3. in terminal run command --->   
 //                     i) nvcc vector_add.cu -o vector_add
