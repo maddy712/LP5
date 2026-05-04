@@ -1,7 +1,4 @@
 
-# ==========================================================
-# PRACTICAL 1 (Using sklearn Boston dataset)
-# ==========================================================
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,40 +9,59 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.datasets import fetch_openml
 
-# Load dataset
+
+
+
+
 boston = fetch_openml(name="boston", version=1, as_frame=False)
 X = boston.data
 y = boston.target.astype(float)
 
-# Split
+
+
+
+
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-# Normalize
+
+
+
+
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# Model (DNN)
+
+
+
 model = Sequential([
     Dense(64, activation='relu', input_shape=(13,)),
     Dense(32, activation='relu'),
     Dense(1)
 ])
 
-# Compile
+
+
 model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
-# Train
+
+
 history = model.fit(X_train, y_train, epochs=50, batch_size=16, validation_split=0.2)
 
-# Evaluate
+
+
+
 loss, mae = model.evaluate(X_test, y_test)
 print("MAE:", mae)
 
-# Predict
+
+
+
 y_pred = model.predict(X_test)
 
-# Graph 1: Loss
+
+
+
 plt.plot(history.history['loss'])
 plt.plot(history.history['val_loss'])
 plt.title("Loss Graph")
@@ -54,7 +70,9 @@ plt.ylabel("Loss")
 plt.legend(["Train", "Validation"])
 plt.show()
 
-# Graph 2: Actual vs Predicted
+
+
+
 plt.scatter(y_test, y_pred)
 plt.xlabel("Actual")
 plt.ylabel("Predicted")
