@@ -1,217 +1,62 @@
 
+# ==========================================================
+# PRACTICAL 1 (Using sklearn Boston dataset)
+# ==========================================================
+
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Dense
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import fetch_openml
 
+# Load dataset
+boston = fetch_openml(name="boston", version=1, as_frame=False)
+X = boston.data
+y = boston.target.astype(float)
 
+# Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-
-
-
-
-
-
-
-
-df = pd.read_csv("C:\\Users\\prash\\Downloads\\HousingData.csv")
-
-# Remove unwanted quotes from column names
-df.columns = df.columns.str.replace('"', '')
-
-# Display dataset
-print(df.head())
-
-
-
-
-
-
-
-
-
-
-
-
-
-X = df.drop("MEDV", axis=1)
-y = df["MEDV"]
-
-print("Shape of X:", X.shape)
-print("Shape of y:", y.shape)
-
-
-
-
-
-
-
-
-
-
-
-
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
+# Normalize
 scaler = StandardScaler()
-
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-
-
-
-
-
-
-
-
-
-
-
+# Model (DNN)
 model = Sequential([
-    Input(shape=(X_train.shape[1],)),
-    
-    Dense(64, activation='relu'),
+    Dense(64, activation='relu', input_shape=(13,)),
     Dense(32, activation='relu'),
-    Dense(16, activation='relu'),
-    
-    Dense(1, activation='linear')   # Output layer (Regression)
+    Dense(1)
 ])
 
-model.compile(
-    optimizer='adam',
-    loss='mse',
-    metrics=['mae']
-)
+# Compile
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
 
-model.summary()
+# Train
+history = model.fit(X_train, y_train, epochs=50, batch_size=16, validation_split=0.2)
 
-
-
-
-
-
-
-
-
-
-
-
-
-early_stop = EarlyStopping(
-    monitor='val_loss',
-    patience=10,
-    restore_best_weights=True
-)
-
-history = model.fit(
-    X_train, y_train,
-    epochs=200,
-    batch_size=16,
-    validation_split=0.2,
-    callbacks=[early_stop],
-    verbose=1
-)
-
-
-
-
-
-
-
-
-
-
-
+# Evaluate
 loss, mae = model.evaluate(X_test, y_test)
+print("MAE:", mae)
 
-print("\nTest Loss (MSE):", loss)
-print("Test MAE:", mae)
-
-
-
-
-
-
-
-
-
-
-
+# Predict
 y_pred = model.predict(X_test)
 
-print("\nActual vs Predicted (First 5 values):")
-for i in range(5):
-    print(f"Actual: {y_test.iloc[i]:.2f} | Predicted: {y_pred[i][0]:.2f}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-plt.figure()
-plt.plot(history.history['loss'], label='Training Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
-plt.legend()
-plt.title("Loss vs Epochs")
-plt.xlabel("Epochs")
+# Graph 1: Loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title("Loss Graph")
+plt.xlabel("Epoch")
 plt.ylabel("Loss")
+plt.legend(["Train", "Validation"])
 plt.show()
 
-plt.figure()
-plt.plot(history.history['mae'], label='Training MAE')
-plt.plot(history.history['val_mae'], label='Validation MAE')
-plt.legend()
-plt.title("MAE vs Epochs")
-plt.xlabel("Epochs")
-plt.ylabel("MAE")
+# Graph 2: Actual vs Predicted
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual")
+plt.ylabel("Predicted")
+plt.title("Actual vs Predicted")
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
